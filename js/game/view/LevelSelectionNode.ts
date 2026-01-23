@@ -11,7 +11,7 @@ import DerivedStringProperty from '../../../../axon/js/DerivedStringProperty.js'
 import Bounds2 from '../../../../dot/js/Bounds2.js';
 import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
 import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.js';
-import TimerToggleButton from '../../../../scenery-phet/js/buttons/TimerToggleButton.js';
+// import TimerToggleButton from '../../../../scenery-phet/js/buttons/TimerToggleButton.js'; // Removed for speedrun mode
 import PhetFont from '../../../../scenery-phet/js/PhetFont.js';
 import AlignGroup from '../../../../scenery/js/layout/constraints/AlignGroup.js';
 import AlignBox from '../../../../scenery/js/layout/nodes/AlignBox.js';
@@ -92,14 +92,14 @@ export default class LevelSelectionNode extends Node {
       chooseYourLevelText.centerX = layoutBounds.centerX;
     } );
 
-    // Timer control, lower left
-    const timerToggleButton = new TimerToggleButton( model.timerEnabledProperty, {
-      stroke: 'black',
-      cornerRadius: 10,
-      x: BUTTON_MARGIN,
-      bottom: layoutBounds.bottom - BUTTON_MARGIN,
-      tandem: tandem.createTandem( 'timerToggleButton' )
-    } );
+    // Timer control - hidden for speedrun mode
+    // const timerToggleButton = new TimerToggleButton( model.timerEnabledProperty, {
+    //   stroke: 'black',
+    //   cornerRadius: 10,
+    //   x: BUTTON_MARGIN,
+    //   bottom: layoutBounds.bottom - BUTTON_MARGIN,
+    //   tandem: tandem.createTandem( 'timerToggleButton' )
+    // } );
 
     // Reset All button, lower right
     const resetAllButton = new ResetAllButton( {
@@ -114,7 +114,7 @@ export default class LevelSelectionNode extends Node {
 
     super( {
       isDisposable: false,
-      children: [ buttonGroup, chooseYourLevelText, timerToggleButton, resetAllButton ],
+      children: [ buttonGroup, chooseYourLevelText, resetAllButton ], // Removed timerToggleButton for speedrun mode
       tandem: tandem,
       phetioDocumentation: 'The user interface for choosing a game level.',
       phetioVisiblePropertyInstrumented: false

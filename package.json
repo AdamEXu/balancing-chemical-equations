@@ -6,6 +6,10 @@
     "type": "git",
     "url": "https://github.com/phetsims/balancing-chemical-equations.git"
   },
+  "scripts": {
+    "build": "grunt --brands=adapted-from-phet",
+    "build:copy": "npm run build && mkdir -p templates && cp build/adapted-from-phet/balancing-chemical-equations_en_adapted-from-phet.html templates/game.html"
+  },
   "devDependencies": {
     "grunt": "~1.5.3"
   },

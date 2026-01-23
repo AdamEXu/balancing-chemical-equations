@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedrunning Balancing Chemical Equations</title>
+</head>
+<body>
+    <h2>Speedrunning Balancing Chemical Equations</h2>
+    <h3>Account</h3>
+    {% if user %}
+    <div>
+        <p>Welcome, {{ user.name }}!</p>
+        <p><a href="/logout">Logout</a></p>
+        <p><a href="/game"><button style="font-size: 40px;">Open game</button></a></p>
+    </div>
+    {% else %}
+    <div>
+        <p><a href="/auth/google">Sign in with Google</a></p>
+    </div>
+    {% endif %}
+    <!-- Leaderboard -->
+    <h3>Leaderboard</h3>
+    <p>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Date/Time (PST)</th>
+            </tr>
+            {% for entry in leaderboard %}
+            <tr>
+                <td>{{ entry.rank }}</td>
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.time }}</td>
+                <td class="date-time">{{ entry.date_time }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </p>
+    {% if user %}
+    <!-- your runs -->
+    <h3>Your Runs</h3>
+    <p>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+            <tr>
+                <th>Index</th>
+                <th>Time</th>
+                <th>Date/Time (PST)</th>
+            </tr>
+            {% for run in runs %}
+            <tr>
+                <td>{{ run.attempt }}</td>
+                <td>{{ run.time }}</td>
+                <td class="date-time">{{ run.date_time }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <h3>FAQ</h3>
+    <p>
+        <ul>
+            <li>
+                <b>How does the game work?</b> Balance the chemical equations idk you figure it out lol
+            </li>
+            <li>
+                <b>How does timing work?</b> Time starts upon first level selection. Time stops upon reaching the 5 star screen for the last level. Must complete all three levels (5 stars). You may reset during the run (doesn't reset timer) but your time will only count if you finish all three levels.
+            </li>
+            <li>
+                <b>Is this even legal?</b> Yep, the code is under creative commons license and the sim is open source. I just forked it and added this stuff. <a href="https://phet.colorado.edu/en/licensing/html" target="_blank">More info here.</a>
+            </li>
+            <li>
+                <b>What score is shown?</b> Only your best time goes on the leaderboard.
+            </li>
+            <li>
+                <b>I got a bad time, how to remove from leaderboard?</b> Here's the great thing, you don't. Just stop skill issuing and get a better time smh
+            </li>
+            <li>
+                <b>How to get better?</b> Idk that's a you problem lmao
+            </li>
+        </ul>
+    </p>
+    <p>
+        &copy;2026 Adam Xu - Open source on <a href="https://github.com/AdamEXu/balancing-chemical-equations" target="_blank">GitHub</a> (would appreciate a star)
+    </p>
+    <p>
+        Fork of <a href="https://phet.colorado.edu/en/simulation/balancing-chemical-equations" target="_blank">Balancing Chemical Equations</a> by PhET Interactive Simulations, University of Colorado Boulder (Github: <a href="https://github.com/phetsims/balancing-chemical-equations" target="_blank">phetsims/balancing-chemical-equations</a>), licensed under <a href="https://phet.colorado.edu/en/licensing/html" target="_blank">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
+    </p>
+    <script>
+        // convert all date-time elements to nicely looking MM/DD/YYYY, HH:MM:SS AM/PM format
+        document.querySelectorAll('.date-time').forEach(element => {
+            const date = new Date(element.textContent);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit',
+                              hour: '2-digit', minute: '2-digit', second: '2-digit',
+                              hour12: true, timeZone: 'America/Los_Angeles' };
+            element.textContent = new Intl.DateTimeFormat('en-US', options).format(date);
+        });
+    </script>
+</body>
+</html>

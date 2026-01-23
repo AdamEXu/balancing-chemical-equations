@@ -14,17 +14,16 @@ import Tandem from '../../tandem/js/Tandem.js';
 import BalancingChemicalEquationsStrings from './BalancingChemicalEquationsStrings.js';
 import BCEPreferences from './common/model/BCEPreferences.js';
 import BCEPreferencesNode from './common/view/BCEPreferencesNode.js';
-import EquationsScreen from './equations/EquationsScreen.js';
+// import EquationsScreen from './equations/EquationsScreen.js'; // SPEEDRUN MODE: Not needed
 import GameScreen from './game/GameScreen.js';
-import IntroScreen from './intro/IntroScreen.js';
+// import IntroScreen from './intro/IntroScreen.js'; // SPEEDRUN MODE: Not needed
 
 simLauncher.launch( () => {
 
   const titleStringProperty = BalancingChemicalEquationsStrings[ 'balancing-chemical-equations' ].titleStringProperty;
 
+  // SPEEDRUN MODE: Only include GameScreen to skip home screen
   const screens = [
-    new IntroScreen( Tandem.ROOT.createTandem( 'introScreen' ) ),
-    new EquationsScreen( Tandem.ROOT.createTandem( 'equationsScreen' ) ),
     new GameScreen( Tandem.ROOT.createTandem( 'gameScreen' ) )
   ];
 

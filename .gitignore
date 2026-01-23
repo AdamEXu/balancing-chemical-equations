@@ -7,3 +7,17 @@ node_modules/
 *.sublime-project
 *.sublime-workspace
 .eslintcache
+
+# Python
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+.pytest_cache/

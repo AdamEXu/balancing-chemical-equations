@@ -20,8 +20,11 @@ import GameModel from './model/GameModel.js';
 import GameScreenView from './view/GameScreenView.js';
 import VBox from '../../../scenery/js/layout/nodes/VBox.js';
 import HBox from '../../../scenery/js/layout/nodes/HBox.js';
+import SpeedrunTimer from '../speedrun/SpeedrunTimer.js';
 
 export default class GameScreen extends Screen<GameModel, GameScreenView> {
+
+  private speedrunTimer: SpeedrunTimer | null = null;
 
   public constructor( tandem: Tandem ) {
 
@@ -33,7 +36,12 @@ export default class GameScreen extends Screen<GameModel, GameScreenView> {
     };
 
     super(
-      () => new GameModel( tandem.createTandem( 'model' ) ),
+      () => {
+        const model = new GameModel( tandem.createTandem( 'model' ) );
+        // Initialize speedrun timer after model is created
+        this.speedrunTimer = new SpeedrunTimer( model );
+        return model;
+      },
       model => new GameScreenView( model, tandem.createTandem( 'view' ) ),
       options
     );
