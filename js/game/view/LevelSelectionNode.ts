@@ -40,11 +40,9 @@ export default class LevelSelectionNode extends Node {
     // To give all molecules the same effective size
     const moleculeAlignGroup = new AlignGroup();
 
-    // Filter levels based on speedrun config
-    const allowedLevels = model.levels.filter( level => SpeedrunConfig.isLevelAllowed( level.levelNumber ) );
-
+    // Create button items for ALL levels (gameLevels param will filter which are shown)
     const buttonItems: LevelSelectionButtonGroupItem[] = [];
-    allowedLevels.forEach( level => {
+    model.levels.forEach( level => {
       buttonItems.push( {
         icon: createLevelSelectionButtonIcon( level, moleculeAlignGroup ),
         scoreProperty: level.bestScoreProperty,
@@ -62,7 +60,7 @@ export default class LevelSelectionNode extends Node {
       } );
     } );
 
-    // Determine which game levels to show based on speedrun config
+    // gameLevels controls which buttons are visible (1-indexed level numbers)
     const gameLevels = SpeedrunConfig.allowedLevels;
 
     const buttonGroup = new LevelSelectionButtonGroup( buttonItems, {
