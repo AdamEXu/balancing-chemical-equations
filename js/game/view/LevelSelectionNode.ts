@@ -27,6 +27,7 @@ import BCEQueryParameters from '../../common/BCEQueryParameters.js';
 import GameLevel from '../model/GameLevel.js';
 import GameModel from '../model/GameModel.js';
 import GameViewProperties from './GameViewProperties.js';
+import SpeedrunConfig from '../../speedrun/SpeedrunConfig.js';
 
 const BUTTON_MARGIN = 20;
 const BUTTON_FONT = new PhetFont( { size: 14, weight: 'bold' } );
@@ -39,8 +40,11 @@ export default class LevelSelectionNode extends Node {
     // To give all molecules the same effective size
     const moleculeAlignGroup = new AlignGroup();
 
+    // Filter levels based on speedrun config
+    const allowedLevels = model.levels.filter( level => SpeedrunConfig.isLevelAllowed( level.levelNumber ) );
+
     const buttonItems: LevelSelectionButtonGroupItem[] = [];
-    model.levels.forEach( level => {
+    allowedLevels.forEach( level => {
       buttonItems.push( {
         icon: createLevelSelectionButtonIcon( level, moleculeAlignGroup ),
         scoreProperty: level.bestScoreProperty,

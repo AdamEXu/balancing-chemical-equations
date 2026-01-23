@@ -2,7 +2,8 @@
 
 /**
  * Speedrun timer for Balancing Chemical Equations.
- * Tracks time from first level selection until all 3 levels achieve 5 stars.
+ * Tracks time from first level selection until required levels achieve 5 stars.
+ * Supports multiple run types: full (all 3), easy (level 1), medium (level 2), hard (level 3).
  *
  * @author Adam Xu
  */
@@ -10,6 +11,7 @@
 import balancingChemicalEquations from '../balancingChemicalEquations.js';
 import GameModel from '../game/model/GameModel.js';
 import GameLevel from '../game/model/GameLevel.js';
+import SpeedrunConfig from './SpeedrunConfig.js';
 
 export default class SpeedrunTimer {
 
@@ -55,7 +57,10 @@ export default class SpeedrunTimer {
     // Listen for level selection to start the timer
     this.model.levelProperty.link( ( level: GameLevel | null ) => {
       if ( level !== null && !this.isRunning && !this.isCompleted ) {
-        this.start();
+        // Only start if selecting an allowed level
+        if ( SpeedrunConfig.isLevelAllowed( level.levelNumber ) ) {
+          this.start();
+        }
       }
     } );
 
@@ -78,11 +83,9 @@ export default class SpeedrunTimer {
   }
 
   private checkCompletion(): void {
-    // Check if all 3 levels have perfect scores
-    if ( this.levelsPerfect.size === 3 &&
-         this.levelsPerfect.has( 1 ) &&
-         this.levelsPerfect.has( 2 ) &&
-         this.levelsPerfect.has( 3 ) ) {
+    // Check if all required levels have perfect scores
+    const allComplete = SpeedrunConfig.allowedLevels.every( levelNum => this.levelsPerfect.has( levelNum ) );
+    if ( allComplete ) {
       this.stop();
     }
   }
@@ -125,12 +128,15 @@ export default class SpeedrunTimer {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify( { time_ms: timeMs } )
+      body: JSON.stringify( {
+        time_ms: timeMs,
+        run_type: SpeedrunConfig.runType
+      } )
     } )
       .then( response => response.json() )
       .then( data => {
         if ( data.success ) {
-          console.log( `Time submitted: ${data.time}` );
+          console.log( `Time submitted: ${data.time} (${data.run_type})` );
         }
         else {
           console.error( 'Failed to submit time:', data.error );

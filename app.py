@@ -17,6 +17,14 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'speedrun.db')
 
+VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard']
+RUN_TYPE_LABELS = {
+    'full': '100% (Full Game)',
+    'easy': 'Easy Only',
+    'medium': 'Medium Only',
+    'hard': 'Hard Only'
+}
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -43,9 +51,15 @@ def init_db():
                 user_name TEXT NOT NULL,
                 user_email TEXT NOT NULL,
                 time_ms INTEGER NOT NULL,
+                run_type TEXT NOT NULL DEFAULT 'full',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        # Migration: add run_type column if it doesn't exist
+        cursor = db.execute("PRAGMA table_info(runs)")
+        columns = [row[1] for row in cursor.fetchall()]
+        if 'run_type' not in columns:
+            db.execute("ALTER TABLE runs ADD COLUMN run_type TEXT NOT NULL DEFAULT 'full'")
         db.commit()
 
 
@@ -58,16 +72,17 @@ def format_time(ms):
     return f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 
-def get_leaderboard():
-    """Get leaderboard with best time per user"""
+def get_leaderboard(run_type='full'):
+    """Get leaderboard with best time per user for a specific run type"""
     db = get_db()
     rows = db.execute('''
         SELECT user_name, MIN(time_ms) as best_time, created_at
         FROM runs
+        WHERE run_type = ?
         GROUP BY user_id
         ORDER BY best_time ASC
-        LIMIT 50
-    ''').fetchall()
+        LIMIT 20
+    ''', (run_type,)).fetchall()
 
     leaderboard = []
     for i, row in enumerate(rows):
@@ -81,24 +96,41 @@ def get_leaderboard():
     return leaderboard
 
 
+def get_all_leaderboards():
+    """Get leaderboards for all run types"""
+    return {
+        run_type: {
+            'label': RUN_TYPE_LABELS[run_type],
+            'entries': get_leaderboard(run_type)
+        }
+        for run_type in VALID_RUN_TYPES
+    }
+
+
 def get_user_runs(user_id):
-    """Get all runs for a user"""
+    """Get all runs for a user, grouped by run type"""
     db = get_db()
     rows = db.execute('''
-        SELECT time_ms, created_at
+        SELECT time_ms, run_type, created_at
         FROM runs
         WHERE user_id = ?
-        ORDER BY created_at DESC
+        ORDER BY created_at ASC
     ''', (user_id,)).fetchall()
 
-    runs = []
-    for i, row in enumerate(rows):
-        runs.append({
-            'time': format_time(row['time_ms']),
-            'attempt': len(rows) - i,
-            'date_time': row['created_at']
-        })
-    return list(reversed(runs))
+    runs = {run_type: [] for run_type in VALID_RUN_TYPES}
+    counters = {run_type: 0 for run_type in VALID_RUN_TYPES}
+
+    for row in rows:
+        run_type = row['run_type']
+        if run_type in runs:
+            counters[run_type] += 1
+            runs[run_type].append({
+                'time': format_time(row['time_ms']),
+                'attempt': counters[run_type],
+                'date_time': row['created_at']
+            })
+
+    return runs
 
 
 def login_required(f):
@@ -115,9 +147,9 @@ def login_required(f):
 def index():
     """Homepage - auth-aware"""
     user = session.get('user')
-    leaderboard = get_leaderboard()
-    runs = get_user_runs(user['id']) if user else []
-    return render_template('index.html', user=user, leaderboard=leaderboard, runs=runs)
+    leaderboards = get_all_leaderboards()
+    runs = get_user_runs(user['id']) if user else {}
+    return render_template('index.html', user=user, leaderboards=leaderboards, runs=runs, run_types=VALID_RUN_TYPES, run_type_labels=RUN_TYPE_LABELS)
 
 
 @app.route('/game')
@@ -249,15 +281,19 @@ def submit_time():
         if time_ms <= 0:
             return jsonify({'error': 'Invalid time'}), 400
 
+        run_type = data.get('run_type', 'full')
+        if run_type not in VALID_RUN_TYPES:
+            return jsonify({'error': 'Invalid run_type'}), 400
+
         user = session['user']
         db = get_db()
         db.execute(
-            'INSERT INTO runs (user_id, user_name, user_email, time_ms) VALUES (?, ?, ?, ?)',
-            (user['id'], user['name'], user['email'], time_ms)
+            'INSERT INTO runs (user_id, user_name, user_email, time_ms, run_type) VALUES (?, ?, ?, ?, ?)',
+            (user['id'], user['name'], user['email'], time_ms, run_type)
         )
         db.commit()
 
-        return jsonify({'success': True, 'time': format_time(time_ms)})
+        return jsonify({'success': True, 'time': format_time(time_ms), 'run_type': run_type})
     except Exception as e:
         print(f"Error submitting time: {e}")
         return jsonify({'error': 'Failed to submit time'}), 500

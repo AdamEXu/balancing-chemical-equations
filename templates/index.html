@@ -11,51 +11,80 @@
     <div>
         <p>Welcome, {{ user.name }}!</p>
         <p><a href="/logout">Logout</a></p>
-        <p><a href="/game"><button style="font-size: 40px;">Open game</button></a></p>
+        <p><button onclick="location.href=`/game?run-type=${document.getElementById('run-type').value}`;" style="font-size: 40px;">Start run</button></p>
+        <p>I want to run <select type="select" name="run-type" id="run-type">
+            <option value="full">100% (full game)</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select></p>
     </div>
     {% else %}
     <div>
         <p><a href="/auth/google">Sign in with Google</a></p>
     </div>
     {% endif %}
-    <!-- Leaderboard -->
-    <h3>Leaderboard</h3>
-    <p>
-        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Time</th>
-                <th>Date/Time (PST)</th>
-            </tr>
-            {% for entry in leaderboard %}
-            <tr>
-                <td>{{ entry.rank }}</td>
-                <td>{{ entry.name }}</td>
-                <td>{{ entry.time }}</td>
-                <td class="date-time">{{ entry.date_time }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </p>
+    <p data-explaining="full">100% = full run, completing all 3 levels</p>
+    <p data-explaining="easy">Easy = complete easy level only</p>
+    <p data-explaining="medium">Medium = complete medium level only</p>
+    <p data-explaining="hard">Hard = complete hard level only</p>
+    <!-- Leaderboards -->
+    <h3>Leaderboards</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for run_type, board in leaderboards.items() %}
+        <div>
+            <h4>{{ board.label }}</h4>
+            {% if board.entries %}
+            <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>Date/Time (PST)</th>
+                </tr>
+                {% for entry in board.entries %}
+                <tr>
+                    <td>{{ entry.rank }}</td>
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.time }}</td>
+                    <td class="date-time">{{ entry.date_time }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p><i>No runs yet</i></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
     {% if user %}
     <!-- your runs -->
     <h3>Your Runs</h3>
-    <p>
-        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
-            <tr>
-                <th>Index</th>
-                <th>Time</th>
-                <th>Date/Time (PST)</th>
-            </tr>
-            {% for run in runs %}
-            <tr>
-                <td>{{ run.attempt }}</td>
-                <td>{{ run.time }}</td>
-                <td class="date-time">{{ run.date_time }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for run_type in run_types %}
+        <div>
+            <h4>{{ run_type_labels[run_type] }}</h4>
+            {% if runs[run_type] %}
+            <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+                <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Date/Time (PST)</th>
+                </tr>
+                {% for run in runs[run_type] %}
+                <tr>
+                    <td>{{ run.attempt }}</td>
+                    <td>{{ run.time }}</td>
+                    <td class="date-time">{{ run.date_time }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p><i>No runs yet</i></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
     {% endif %}
     <h3>FAQ</h3>
     <p>
