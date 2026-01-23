@@ -64,27 +64,33 @@ export default class SpeedrunTimer {
       }
     } );
 
-    // Listen for each level's bestScoreProperty to track perfect scores
+    // Listen for each allowed level's bestScoreProperty to track perfect scores
     this.model.levels.forEach( ( level: GameLevel ) => {
-      level.bestScoreProperty.link( ( score: number ) => {
-        if ( this.isRunning && !this.isCompleted ) {
+      // Only track scores for allowed levels
+      if ( SpeedrunConfig.isLevelAllowed( level.levelNumber ) ) {
+        level.bestScoreProperty.link( ( score: number ) => {
           const perfectScore = level.getPerfectScore();
-          if ( score >= perfectScore ) {
-            this.levelsPerfect.add( level.levelNumber );
-            this.checkCompletion();
+          console.log( `Level ${level.levelNumber} score: ${score}/${perfectScore}, running: ${this.isRunning}` );
+          if ( this.isRunning && !this.isCompleted ) {
+            if ( score >= perfectScore ) {
+              this.levelsPerfect.add( level.levelNumber );
+              console.log( `Level ${level.levelNumber} perfect! Levels complete: ${[ ...this.levelsPerfect ]}` );
+              this.checkCompletion();
+            }
+            else {
+              // If score drops below perfect (e.g., after reset), remove from set
+              this.levelsPerfect.delete( level.levelNumber );
+            }
           }
-          else {
-            // If score drops below perfect (e.g., after reset), remove from set
-            this.levelsPerfect.delete( level.levelNumber );
-          }
-        }
-      } );
+        } );
+      }
     } );
   }
 
   private checkCompletion(): void {
     // Check if all required levels have perfect scores
     const allComplete = SpeedrunConfig.allowedLevels.every( levelNum => this.levelsPerfect.has( levelNum ) );
+    console.log( `Check completion: required=${SpeedrunConfig.allowedLevels}, have=${[ ...this.levelsPerfect ]}, complete=${allComplete}` );
     if ( allComplete ) {
       this.stop();
     }

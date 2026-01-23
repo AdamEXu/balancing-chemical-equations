@@ -23,7 +23,7 @@ import LevelSelectionButtonGroup, { LevelSelectionButtonGroupItem } from '../../
 import ScoreDisplayStars from '../../../../vegas/js/ScoreDisplayStars.js';
 import balancingChemicalEquations from '../../balancingChemicalEquations.js';
 import BalancingChemicalEquationsStrings from '../../BalancingChemicalEquationsStrings.js';
-import BCEQueryParameters from '../../common/BCEQueryParameters.js';
+
 import GameLevel from '../model/GameLevel.js';
 import GameModel from '../model/GameModel.js';
 import GameViewProperties from './GameViewProperties.js';
@@ -62,6 +62,9 @@ export default class LevelSelectionNode extends Node {
       } );
     } );
 
+    // Determine which game levels to show based on speedrun config
+    const gameLevels = SpeedrunConfig.allowedLevels;
+
     const buttonGroup = new LevelSelectionButtonGroup( buttonItems, {
       levelSelectionButtonOptions: {
         baseColor: '#d9ebff'
@@ -72,7 +75,7 @@ export default class LevelSelectionNode extends Node {
       },
       groupButtonHeight: 155,
       groupButtonWidth: 155,
-      gameLevels: BCEQueryParameters.gameLevels,
+      gameLevels: gameLevels,
       tandem: tandem.createTandem( 'buttonGroup' ),
       phetioVisiblePropertyInstrumented: false
     } );
