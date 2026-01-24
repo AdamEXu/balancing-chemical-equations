@@ -22,6 +22,7 @@ export default class SpeedrunTimer {
   private isRunning = false;
   private isCompleted = false;
   private animationFrameId: number | null = null;
+  private musicAudio: HTMLAudioElement | null = null;
 
   // Track which levels have achieved 5 stars (perfect score)
   private readonly levelsPerfect = new Set<number>();
@@ -30,6 +31,16 @@ export default class SpeedrunTimer {
     this.model = model;
     this.createTimerElement();
     this.setupListeners();
+    this.setupMusic();
+  }
+
+  private setupMusic(): void {
+    console.log( `Music enabled: ${SpeedrunConfig.musicEnabled}` );
+    if ( SpeedrunConfig.musicEnabled ) {
+      this.musicAudio = new Audio( '/static/speedrun.mp3' );
+      this.musicAudio.loop = true;
+      this.musicAudio.volume = 1;
+    }
   }
 
   private createTimerElement(): void {
@@ -71,20 +82,61 @@ export default class SpeedrunTimer {
         level.bestScoreProperty.link( ( score: number ) => {
           const perfectScore = level.getPerfectScore();
           console.log( `Level ${level.levelNumber} score: ${score}/${perfectScore}, running: ${this.isRunning}` );
-          if ( this.isRunning && !this.isCompleted ) {
+
+          if ( score === 0 ) {
+            // Score reset - remove from perfect set and check if full reset
+            this.levelsPerfect.delete( level.levelNumber );
+            this.checkForFullReset();
+          }
+          else if ( this.isRunning && !this.isCompleted ) {
             if ( score >= perfectScore ) {
               this.levelsPerfect.add( level.levelNumber );
               console.log( `Level ${level.levelNumber} perfect! Levels complete: ${[ ...this.levelsPerfect ]}` );
               this.checkCompletion();
             }
             else {
-              // If score drops below perfect (e.g., after reset), remove from set
+              // If score drops below perfect, remove from set
               this.levelsPerfect.delete( level.levelNumber );
             }
           }
         } );
       }
     } );
+  }
+
+  private checkForFullReset(): void {
+    // Check if ALL allowed levels have score 0 - indicates a full reset
+    const allZero = SpeedrunConfig.allowedLevels.every( levelNum => {
+      const level = this.model.levels.find( l => l.levelNumber === levelNum );
+      return level && level.bestScoreProperty.value === 0;
+    } );
+
+    if ( allZero && ( this.isRunning || this.isCompleted || this.elapsedTime > 0 ) ) {
+      console.log( 'Full reset detected - resetting timer' );
+      this.resetTimer();
+    }
+  }
+
+  private resetTimer(): void {
+    // Stop any running animation
+    if ( this.animationFrameId !== null ) {
+      cancelAnimationFrame( this.animationFrameId );
+      this.animationFrameId = null;
+    }
+
+    // Stop music
+    this.stopMusic();
+
+    // Reset all state
+    this.isRunning = false;
+    this.isCompleted = false;
+    this.startTime = 0;
+    this.elapsedTime = 0;
+    this.levelsPerfect.clear();
+
+    // Reset display
+    this.updateTimerColor( 'white' );
+    this.updateDisplay();
   }
 
   private checkCompletion(): void {
@@ -104,6 +156,7 @@ export default class SpeedrunTimer {
     this.isRunning = true;
     this.startTime = performance.now();
     this.updateTimerColor( '#00ff00' ); // Green when running
+    this.startMusic();
     this.tick();
   }
 
@@ -121,9 +174,38 @@ export default class SpeedrunTimer {
       this.animationFrameId = null;
     }
 
+    this.stopMusic();
+    this.playWinSound();
     this.updateTimerColor( 'white' ); // White when stopped/completed
     this.updateDisplay();
     this.submitTime();
+  }
+
+  private startMusic(): void {
+    if ( this.musicAudio ) {
+      this.musicAudio.currentTime = 0;
+      this.musicAudio.play().catch( () => {
+        // Autoplay may be blocked, ignore error
+      } );
+    }
+  }
+
+  private stopMusic(): void {
+    if ( this.musicAudio ) {
+      this.musicAudio.pause();
+      this.musicAudio.currentTime = 0;
+    }
+  }
+
+  private playWinSound(): void {
+    if ( SpeedrunConfig.musicEnabled ) {
+      const winAudio = new Audio( '/static/win.mp3' );
+      winAudio.volume = 1;
+      winAudio.loop = true;
+      winAudio.play().catch( () => {
+        // Ignore autoplay errors
+      } );
+    }
   }
 
   private submitTime(): void {

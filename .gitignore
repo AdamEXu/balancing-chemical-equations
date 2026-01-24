@@ -21,3 +21,4 @@ ENV/
 *.egg-info/
 dist/
 .pytest_cache/
+speedrun.db

@@ -5,18 +5,60 @@
     <title>Speedrunning Balancing Chemical Equations</title>
 </head>
 <body>
-    <h2>Speedrunning Balancing Chemical Equations</h2>
-    <h3>Account</h3>
+    <div>
+        <style>
+            @keyframes rainbow {
+                0% { color: red; }
+                14% { color: orange; }
+                28% { color: yellow; }
+                42% { color: green; }
+                56% { color: blue; }
+                70% { color: indigo; }
+                84% { color: violet; }
+                100% { color: red; }
+            }
+            #title {
+                animation: rainbow 10s infinite;
+                text-shadow: 1px 1px 4px #000000;
+            }
+        </style>
+        <h1 id="title">Speedrunning Balancing Chemical Equations</h1>
+    </div>
     {% if user %}
     <div>
         <p>Welcome, {{ user.name }}!</p>
         <p><a href="/logout">Logout</a></p>
-        <p><button onclick="location.href=`/game?run-type=${document.getElementById('run-type').value}`;" style="font-size: 40px;">Start run</button></p>
-        <p>I want to run <select type="select" name="run-type" id="run-type">
+        <div>
+            <style>
+                @keyframes button-pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+                button {
+                    animation: button-pulse 2s infinite;
+                    border: none;
+                    background-color: blue;
+                    color: white;
+                    padding: 0;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-family: serif;
+                    margin: 20px;
+                    cursor: pointer;
+                }
+                button:hover {
+                    background-color: darkblue;
+                }
+            </style>
+            <p style="width: 100%; text-align: center;"><button onclick="location.href=`/game?run-type=${document.getElementById('run-type').value}&music=${musicOn}`;" style="font-size: 67px;">Open simulator</button></p>
+        </div>
+        <p><b>Category selection: </b><select type="select" name="run-type" id="run-type">
             <option value="full">100% (full game)</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="easy">Easy (level 1)</option>
+            <option value="medium">Medium (level 2)</option>
+            <option value="hard">Hard (level 3)</option>
         </select></p>
     </div>
     {% else %}
@@ -24,12 +66,24 @@
         <p><a href="/auth/google">Sign in with Google</a></p>
     </div>
     {% endif %}
-    <p data-explaining="full">100% = full run, completing all 3 levels</p>
-    <p data-explaining="easy">Easy = complete easy level only</p>
-    <p data-explaining="medium">Medium = complete medium level only</p>
-    <p data-explaining="hard">Hard = complete hard level only</p>
+    <p>100% = full run, completing all 3 levels, Easy = complete level 1 only, Medium = complete level 2 only, Hard = complete level 3 only</p>
+    <div>
+        <style>
+            @keyframes bounce {
+                0% { transform: translateY(0) scale(1.1) translateX(16px) scaleX(1.2) rotate(10deg); }
+                50% { transform: translateY(-10px) scale(1.1) translateX(16px) scaleX(1.2) rotate(10deg); }
+                100% { transform: translateY(0) scale(1.1) translateX(16px) scaleX(1.2) rotate(10deg); }
+            }
+
+            img:hover {
+                animation: bounce 0.5s;
+                transform: scale(1.1) translateX(16px) scaleX(1.2) rotate(10deg);
+            }
+        </style>
+        <a onclick="toggleMusic()" style="cursor: pointer;"><img src="/static/hourglass.gif" alt="Speedrun Timer" width="100"/></a></div>
+    <p>Click the above image to toggle music <b id="mus-status" style="color: red;">(music is currently off)</b></p>
     <!-- Leaderboards -->
-    <h3>Leaderboards</h3>
+    <h2 style="margin-top: 32px; margin-bottom: 0;">Leaderboards</h2>
     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
         {% for run_type, board in leaderboards.items() %}
         <div>
@@ -40,7 +94,7 @@
                     <th>Rank</th>
                     <th>Name</th>
                     <th>Time</th>
-                    <th>Date/Time (PST)</th>
+                    <th>Date/Time (Local)</th>
                 </tr>
                 {% for entry in board.entries %}
                 <tr>
@@ -59,7 +113,7 @@
     </div>
     {% if user %}
     <!-- your runs -->
-    <h3>Your Runs</h3>
+    <h2 style="margin-bottom: 0; margin-top: 32px;">Your Runs</h2>
     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
         {% for run_type in run_types %}
         <div>
@@ -69,7 +123,7 @@
                 <tr>
                     <th>#</th>
                     <th>Time</th>
-                    <th>Date/Time (PST)</th>
+                    <th>Date/Time (Local)</th>
                 </tr>
                 {% for run in runs[run_type] %}
                 <tr>
@@ -110,20 +164,53 @@
         </ul>
     </p>
     <p>
-        &copy;2026 Adam Xu - Open source on <a href="https://github.com/AdamEXu/balancing-chemical-equations" target="_blank">GitHub</a> (would appreciate a star)
+        &copy;2026 Adam Xu - Open source on GitHub <a href="https://github.com/AdamEXu/balancing-chemical-equations" target="_blank">AdamEXu/balancing-chemical-equations</a> (would appreciate a star)
     </p>
     <p>
         Fork of <a href="https://phet.colorado.edu/en/simulation/balancing-chemical-equations" target="_blank">Balancing Chemical Equations</a> by PhET Interactive Simulations, University of Colorado Boulder (Github: <a href="https://github.com/phetsims/balancing-chemical-equations" target="_blank">phetsims/balancing-chemical-equations</a>), licensed under <a href="https://phet.colorado.edu/en/licensing/html" target="_blank">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
     </p>
     <script>
-        // convert all date-time elements to nicely looking MM/DD/YYYY, HH:MM:SS AM/PM format
+        // convert all date-time elements to user's local timezone
         document.querySelectorAll('.date-time').forEach(element => {
-            const date = new Date(element.textContent);
+            const date = new Date(element.textContent + ' UTC');
             const options = { year: 'numeric', month: '2-digit', day: '2-digit',
                               hour: '2-digit', minute: '2-digit', second: '2-digit',
-                              hour12: true, timeZone: 'America/Los_Angeles' };
+                              hour12: true };
             element.textContent = new Intl.DateTimeFormat('en-US', options).format(date);
         });
+
+        // music toggle
+        let musicOn = false;
+
+        function toggleMusic() {
+            musicOn = !musicOn;
+            if (musicOn) {
+                document.getElementById('mus-status').textContent = '(music is currently on)';
+                document.getElementById('mus-status').style.color = 'green';
+                playMusic();
+            } else {
+                document.getElementById('mus-status').textContent = '(music is currently off)';
+                document.getElementById('mus-status').style.color = 'red';
+                stopMusic();
+            }
+        }
+
+        let currentAudio = new Audio('/static/load.mp3');
+        
+        function playMusic() {
+            if (!currentAudio) {
+                currentAudio = new Audio('/static/load.mp3');
+            }
+            currentAudio.loop = true;
+            currentAudio.volume = 1;
+            currentAudio.play();
+        }
+
+        function stopMusic() {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+        }
     </script>
 </body>
 </html>

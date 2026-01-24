@@ -21,14 +21,16 @@ class SpeedrunConfigClass {
 
   public readonly runType: RunType;
   public readonly allowedLevels: number[];
+  public readonly musicEnabled: boolean;
 
   public constructor() {
-    this.runType = this.getRunTypeFromURL();
+    const params = new URLSearchParams( window.location.search );
+    this.runType = this.getRunTypeFromURL( params );
     this.allowedLevels = RUN_TYPE_ALLOWED_LEVELS[ this.runType ];
+    this.musicEnabled = params.get( 'music' ) === 'true';
   }
 
-  private getRunTypeFromURL(): RunType {
-    const params = new URLSearchParams( window.location.search );
+  private getRunTypeFromURL( params: URLSearchParams ): RunType {
     const type = params.get( 'run-type' );
     if ( type === 'easy' || type === 'medium' || type === 'hard' || type === 'full' ) {
       return type;
