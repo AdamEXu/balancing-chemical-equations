@@ -301,4 +301,4 @@ def submit_time():
 
 if __name__ == '__main__':
     init_db()
-    app.run(port=3002, debug=True)
+    app.run(port=3002, debug=os.getenv("DEBUG", False))
