@@ -35,7 +35,10 @@ const BCEQueryParameters = QueryStringMachine.getAll( {
   autoBalance: { type: 'flag' },
 
   // Verifies the game model by creating lots of equation sets for each game level.
-  verifyGame: { type: 'flag' }
+  verifyGame: { type: 'flag' },
+
+  // Use remix equation pools (expanded set of molecules and equations).
+  remix: { type: 'flag' }
 } );
 
 balancingChemicalEquations.register( 'BCEQueryParameters', BCEQueryParameters );

@@ -17,12 +17,16 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'speedrun.db')
 
-VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard']
+VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard', 'remix-full', 'remix-easy', 'remix-medium', 'remix-hard']
 RUN_TYPE_LABELS = {
     'full': '100% (Full Game)',
     'easy': 'Easy Only',
     'medium': 'Medium Only',
-    'hard': 'Hard Only'
+    'hard': 'Hard Only',
+    'remix-full': '[Remix] 100% (Full Game)',
+    'remix-easy': '[Remix] Easy (Level 1)',
+    'remix-medium': '[Remix] Medium (Level 2)',
+    'remix-hard': '[Remix] Hard (Level 3)'
 }
 
 

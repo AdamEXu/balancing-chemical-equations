@@ -61,10 +61,18 @@
             <p style="width: 100%; text-align: center;"><button id="open-simulator-btn" style="font-size: 67px;">Open simulator</button></p>
         </div>
         <p><b>Category selection: </b><select type="select" name="run-type" id="run-type">
-            <option value="full">100% (full game)</option>
-            <option value="easy">Easy (level 1)</option>
-            <option value="medium">Medium (level 2)</option>
-            <option value="hard">Hard (level 3)</option>
+            <optgroup label="Original">
+                <option value="full">100% (full game)</option>
+                <option value="easy">Easy (level 1)</option>
+                <option value="medium">Medium (level 2)</option>
+                <option value="hard">Hard (level 3)</option>
+            </optgroup>
+            <optgroup label="Remix">
+                <option value="remix-full">[Remix] 100% (full game)</option>
+                <option value="remix-easy">[Remix] Easy (level 1)</option>
+                <option value="remix-medium">[Remix] Medium (level 2)</option>
+                <option value="remix-hard">[Remix] Hard (level 3)</option>
+            </optgroup>
         </select></p>
     </div>
     {% else %}
@@ -96,7 +104,7 @@
     <p>Click the above image to toggle music <b id="mus-status" style="color: red;">(music is currently off)</b></p>
     <!-- Leaderboards -->
     <h2 style="margin-top: 32px; margin-bottom: 0;">Leaderboards</h2>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <div id="leaderboards" style="display: flex; flex-wrap: wrap; gap: 20px;">
         {% for run_type, board in leaderboards.items() %}
         <div>
             <h4>{{ board.label }}</h4>
@@ -260,13 +268,38 @@
             }
         })();
 
+        // Apply gold background to first place rows (leaderboards only, not user's runs)
+        var leaderboardSection = document.getElementById('leaderboards');
+        if (leaderboardSection) {
+            leaderboardSection.querySelectorAll('table tr').forEach(function(row) {
+                var rankCell = row.querySelector('td:first-child');
+                if (rankCell && rankCell.textContent.trim() === '🥇') {
+                    row.querySelectorAll('td').forEach(function(td) {
+                        td.style.backgroundImage = 'url(/static/gold-bg.gif)';
+                        td.style.backgroundSize = 'cover';
+                        td.style.backgroundPosition = 'center';
+                        td.style.fontWeight = 'bold';
+                    });
+                } else if (rankCell && rankCell.textContent.trim() === '🥈') 
+                {
+                    row.querySelectorAll('td').forEach(function(td) {
+                        td.style.backgroundImage = 'url(/static/silver.jpg)';
+                        td.style.backgroundSize = 'cover';
+                        td.style.backgroundPosition = 'center';
+                    });
+                }
+            });
+        }
+
         // convert all date-time elements to user's local timezone - do this LAST
         setTimeout(function() {
             document.querySelectorAll('.date-time').forEach(function(element) {
                 try {
                     var dateText = element.textContent.trim();
                     if (dateText && dateText.length > 0) {
-                        var date = new Date(dateText + ' UTC');
+                        // iOS Safari requires ISO 8601 format - convert "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SSZ"
+                        var isoDate = dateText.replace(' ', 'T') + 'Z';
+                        var date = new Date(isoDate);
                         if (date && !isNaN(date.getTime()) && isFinite(date.getTime())) {
                             var options = { 
                                 year: 'numeric', 

@@ -30,6 +30,9 @@ import GameLevel from './GameLevel.js';
 import GameLevel1 from './GameLevel1.js';
 import GameLevel2 from './GameLevel2.js';
 import GameLevel3 from './GameLevel3.js';
+import RemixGameLevel1 from './remix/GameLevel1.js';
+import RemixGameLevel2 from './remix/GameLevel2.js';
+import RemixGameLevel3 from './remix/GameLevel3.js';
 import { GameState, GameStateValues, isValidGameStateTransition } from './GameState.js';
 
 const ATTEMPTS_RANGE = new Range( 0, 2 );
@@ -83,11 +86,21 @@ export default class GameModel implements TModel {
 
     this.coefficientsRange = new Range( 0, 7 );
 
-    this.levels = [
-      new GameLevel1( this.coefficientsRange, tandem.createTandem( 'level1' ) ),
-      new GameLevel2( this.coefficientsRange, tandem.createTandem( 'level2' ) ),
-      new GameLevel3( this.coefficientsRange, tandem.createTandem( 'level3' ) )
-    ];
+    // Use remix pools if the remix query parameter is set.
+    if ( BCEQueryParameters.remix ) {
+      this.levels = [
+        new RemixGameLevel1( this.coefficientsRange, tandem.createTandem( 'level1' ) ),
+        new RemixGameLevel2( this.coefficientsRange, tandem.createTandem( 'level2' ) ),
+        new RemixGameLevel3( this.coefficientsRange, tandem.createTandem( 'level3' ) )
+      ];
+    }
+    else {
+      this.levels = [
+        new GameLevel1( this.coefficientsRange, tandem.createTandem( 'level1' ) ),
+        new GameLevel2( this.coefficientsRange, tandem.createTandem( 'level2' ) ),
+        new GameLevel3( this.coefficientsRange, tandem.createTandem( 'level3' ) )
+      ];
+    }
 
     this.levelProperty = new Property<GameLevel | null>( null, {
       validValues: [ ...this.levels, null ],
