@@ -1,7 +1,7 @@
 // Copyright 2025, University of Colorado Boulder
 
 /**
- * GameLevel1 is level 1 in the Game screen (Remix version).
+ * GameLevel3 is level 3 in the Game screen (Remix version).
  *
  * @author Chris Malley (PixelZoom, Inc.)
  */
@@ -11,21 +11,21 @@ import GameLevel from '../GameLevel.js';
 import Tandem from '../../../../../tandem/js/Tandem.js';
 import Range from '../../../../../dot/js/Range.js';
 import Molecule from '../../../common/model/Molecule.js';
-import EquationPool1 from './EquationPool1.js';
+import EquationPool3 from './EquationPool3.js';
 
-export default class GameLevel1 extends GameLevel {
+export default class RemixGameLevel3 extends GameLevel {
 
   public constructor( coefficientsRange: Range, tandem: Tandem ) {
 
     super( {
-      levelNumber: 1,
-      iconMolecule: Molecule.NaCl,
+      levelNumber: 3,
+      iconMolecule: Molecule.H2SO4,
       coefficientsRange: coefficientsRange,
-      equationPool: new EquationPool1( coefficientsRange, tandem.createTandem( 'equationPool' ) ),
-      getViewMode: () => 'balanceScales',
+      equationPool: new EquationPool3( coefficientsRange, tandem.createTandem( 'equationPool' ) ),
+      getViewMode: () => 'barCharts',
       tandem: tandem
     } );
   }
 }
 
-balancingChemicalEquations.register( 'GameLevel1', GameLevel1 );
+balancingChemicalEquations.register( 'RemixGameLevel3', RemixGameLevel3 );

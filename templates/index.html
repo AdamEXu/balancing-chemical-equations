@@ -61,17 +61,11 @@
             <p style="width: 100%; text-align: center;"><button id="open-simulator-btn" style="font-size: 67px;">Open simulator</button></p>
         </div>
         <p><b>Category selection: </b><select type="select" name="run-type" id="run-type">
-            <optgroup label="Original">
+            <optgroup label="Classic">
                 <option value="full">100% (full game)</option>
                 <option value="easy">Easy (level 1)</option>
                 <option value="medium">Medium (level 2)</option>
                 <option value="hard">Hard (level 3)</option>
-            </optgroup>
-            <optgroup label="Remix">
-                <option value="remix-full">[Remix] 100% (full game)</option>
-                <option value="remix-easy">[Remix] Easy (level 1)</option>
-                <option value="remix-medium">[Remix] Medium (level 2)</option>
-                <option value="remix-hard">[Remix] Hard (level 3)</option>
             </optgroup>
         </select></p>
     </div>
@@ -236,7 +230,30 @@
 
         function openSimulator() {
             var runType = document.getElementById('run-type').value;
-            window.location.href = '/game?run-type=' + runType + '&music=' + musicOn;
+            var url = '/game?run-type=' + runType + '&music=' + musicOn;
+            
+            // Map run-type to gameLevels query parameter
+            var gameLevelsMap = {
+                'full': '1,2,3',
+                'easy': '1',
+                'medium': '2',
+                'hard': '3',
+                'remix-full': '1,2,3',
+                'remix-easy': '1',
+                'remix-medium': '2',
+                'remix-hard': '3'
+            };
+            
+            if (gameLevelsMap[runType]) {
+                url += '&gameLevels=' + gameLevelsMap[runType];
+            }
+            
+            // Add remix flag for remix categories
+            if (runType.startsWith('remix-')) {
+                url += '&remix';
+            }
+            
+            window.location.href = url;
         }
 
         // Add event listeners immediately - use both touch and click for Safari

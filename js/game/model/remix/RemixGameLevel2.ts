@@ -14,7 +14,7 @@ import dotRandom from '../../../../../dot/js/dotRandom.js';
 import Molecule from '../../../common/model/Molecule.js';
 import EquationPool2 from './EquationPool2.js';
 
-export default class GameLevel2 extends GameLevel {
+export default class RemixGameLevel2 extends GameLevel {
 
   public constructor( coefficientsRange: Range, tandem: Tandem ) {
 
@@ -29,4 +29,4 @@ export default class GameLevel2 extends GameLevel {
   }
 }
 
-balancingChemicalEquations.register( 'GameLevel2', GameLevel2 );
+balancingChemicalEquations.register( 'RemixGameLevel2', RemixGameLevel2 );
