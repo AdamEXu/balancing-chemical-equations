@@ -22,7 +22,11 @@ RUN_TYPE_LABELS = {
     'full': '100% (Full Game)',
     'easy': 'Easy Only',
     'medium': 'Medium Only',
-    'hard': 'Hard Only'
+    'hard': 'Hard Only',
+    'remix-full': '[Remix] 100% (Full Game)',
+    'remix-easy': '[Remix] Easy (Level 1)',
+    'remix-medium': '[Remix] Medium (Level 2)',
+    'remix-hard': '[Remix] Hard (Level 3)'
 }
 
 
@@ -147,9 +151,14 @@ def login_required(f):
 def index():
     """Homepage - auth-aware"""
     user = session.get('user')
-    leaderboards = get_all_leaderboards()
+    all_leaderboards = get_all_leaderboards()
     runs = get_user_runs(user['id']) if user else {}
-    return render_template('index.html', user=user, leaderboards=leaderboards, runs=runs, run_types=VALID_RUN_TYPES, run_type_labels=RUN_TYPE_LABELS)
+
+    # Filter out remix categories from UI (keep backend logic intact)
+    non_remix_types = [rt for rt in VALID_RUN_TYPES if not rt.startswith('remix-')]
+    ui_leaderboards = {k: v for k, v in all_leaderboards.items() if not k.startswith('remix-')}
+
+    return render_template('index.html', user=user, leaderboards=ui_leaderboards, runs=runs, run_types=non_remix_types, run_type_labels=RUN_TYPE_LABELS)
 
 
 @app.route('/game')
