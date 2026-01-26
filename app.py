@@ -22,11 +22,7 @@ RUN_TYPE_LABELS = {
     'full': '100% (Full Game)',
     'easy': 'Easy Only',
     'medium': 'Medium Only',
-    'hard': 'Hard Only',
-    'remix-full': '[Remix] 100% (Full Game)',
-    'remix-easy': '[Remix] Easy (Level 1)',
-    'remix-medium': '[Remix] Medium (Level 2)',
-    'remix-hard': '[Remix] Hard (Level 3)'
+    'hard': 'Hard Only'
 }
 
 
