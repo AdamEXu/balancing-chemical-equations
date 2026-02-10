@@ -17,16 +17,29 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 DATABASE = os.path.join(os.path.dirname(__file__), 'speedrun.db')
 
-VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard', 'remix-full', 'remix-easy', 'remix-medium', 'remix-hard']
+VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard', 'rpl-full', 'rpl-easy', 'rpl-medium', 'rpl-hard']
 RUN_TYPE_LABELS = {
     'full': '100% (Full Game)',
     'easy': 'Easy Only',
     'medium': 'Medium Only',
     'hard': 'Hard Only',
-    'remix-full': '[Remix] 100% (Full Game)',
-    'remix-easy': '[Remix] Easy (Level 1)',
-    'remix-medium': '[Remix] Medium (Level 2)',
-    'remix-hard': '[Remix] Hard (Level 3)'
+    'rpl-full': '100% (Full Game)',
+    'rpl-easy': 'Easy Only',
+    'rpl-medium': 'Medium Only',
+    'rpl-hard': 'Hard Only',
+}
+
+CATEGORIES = {
+    'balancing': {
+        'label': 'Balancing',
+        'run_types': ['full', 'easy', 'medium', 'hard'],
+        'game_url': '/game'
+    },
+    'rpl': {
+        'label': 'Products & Leftovers',
+        'run_types': ['rpl-full', 'rpl-easy', 'rpl-medium', 'rpl-hard'],
+        'game_url': '/game2'
+    }
 }
 
 
@@ -154,11 +167,8 @@ def index():
     all_leaderboards = get_all_leaderboards()
     runs = get_user_runs(user['id']) if user else {}
 
-    # Filter out remix categories from UI (keep backend logic intact)
-    non_remix_types = [rt for rt in VALID_RUN_TYPES if not rt.startswith('remix-')]
-    ui_leaderboards = {k: v for k, v in all_leaderboards.items() if not k.startswith('remix-')}
-
-    return render_template('index.html', user=user, leaderboards=ui_leaderboards, runs=runs, run_types=non_remix_types, run_type_labels=RUN_TYPE_LABELS)
+    return render_template('index.html', user=user, leaderboards=all_leaderboards, runs=runs,
+                         run_type_labels=RUN_TYPE_LABELS, categories=CATEGORIES)
 
 
 @app.route('/game')
@@ -174,6 +184,26 @@ def game():
         return render_template(
             'fail.html',
             error='Game build not found. Please run: npx grunt --brands=adapted-from-phet',
+            link='/'
+        )
+
+    with open(build_path, 'r') as f:
+        return f.read()
+
+
+@app.route('/game2')
+@login_required
+def game2():
+    """Game 2 route - requires login, serves built RPL game HTML with speedrun modifications"""
+    build_path = os.path.join(
+        os.path.dirname(__file__),
+        '../reactants-products-and-leftovers/build/adapted-from-phet/reactants-products-and-leftovers_en_adapted-from-phet.html'
+    )
+
+    if not os.path.exists(build_path):
+        return render_template(
+            'fail.html',
+            error='Game build not found. Please run: npx grunt --brands=adapted-from-phet in the reactants-products-and-leftovers directory',
             link='/'
         )
 

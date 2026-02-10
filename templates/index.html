@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speedrunning Balancing Chemical Equations</title>
+    <title>Speedrunning Chemistry Simulations</title>
 </head>
 <body>
     <div style="text-align: center; padding: 20px;">
@@ -23,7 +23,7 @@
                 font-size: 48px !important;
             }
         </style>
-        <h1 id="title">Speedrunning Balancing Chemical Equations</h1>
+        <h1 id="title">Speedrunning Chemistry Simulations</h1>
     </div>
     {% if user %}
     <div>
@@ -61,11 +61,17 @@
             <p style="width: 100%; text-align: center;"><button id="open-simulator-btn" style="font-size: 67px;">Open simulator</button></p>
         </div>
         <p><b>Category selection: </b><select type="select" name="run-type" id="run-type">
-            <optgroup label="Classic">
+            <optgroup label="Balancing">
                 <option value="full">100% (full game)</option>
                 <option value="easy">Easy (level 1)</option>
                 <option value="medium">Medium (level 2)</option>
                 <option value="hard">Hard (level 3)</option>
+            </optgroup>
+            <optgroup label="Products & Leftovers">
+                <option value="rpl-full">100% (full game)</option>
+                <option value="rpl-easy">Easy (level 1)</option>
+                <option value="rpl-medium">Medium (level 2)</option>
+                <option value="rpl-hard">Hard (level 3)</option>
             </optgroup>
         </select></p>
     </div>
@@ -98,11 +104,13 @@
     <p>Click the above image to toggle music <b id="mus-status" style="color: red;">(music is currently off)</b></p>
     <!-- Leaderboards -->
     <h2 style="margin-top: 32px; margin-bottom: 0;">Leaderboards</h2>
-    <div id="leaderboards" style="display: flex; flex-wrap: wrap; gap: 20px;">
-        {% for run_type, board in leaderboards.items() %}
+    {% for cat_key, cat in categories.items() %}
+    <h3>{{ cat.label }}</h3>
+    <div class="leaderboards" style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for run_type in cat.run_types %}
         <div>
-            <h4>{{ board.label }}</h4>
-            {% if board.entries %}
+            <h4>{{ run_type_labels[run_type] }}</h4>
+            {% if leaderboards[run_type] and leaderboards[run_type].entries %}
             <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
                 <tr>
                     <th>Rank</th>
@@ -110,7 +118,7 @@
                     <th>Time</th>
                     <th>Date/Time (Local)</th>
                 </tr>
-                {% for entry in board.entries %}
+                {% for entry in leaderboards[run_type].entries %}
                 <tr>
                     <td>{{ entry.rank }}</td>
                     <td>{{ entry.name }}</td>
@@ -125,11 +133,14 @@
         </div>
         {% endfor %}
     </div>
+    {% endfor %}
     {% if user %}
     <!-- your runs -->
     <h2 style="margin-bottom: 0; margin-top: 32px;">Your Runs</h2>
+    {% for cat_key, cat in categories.items() %}
+    <h3>{{ cat.label }}</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        {% for run_type in run_types %}
+        {% for run_type in cat.run_types %}
         <div>
             <h4>{{ run_type_labels[run_type] }}</h4>
             {% if runs[run_type] %}
@@ -153,12 +164,13 @@
         </div>
         {% endfor %}
     </div>
+    {% endfor %}
     {% endif %}
     <h3>FAQ</h3>
     <p>
         <ul>
             <li>
-                <b>How does the game work?</b> Balance the chemical equations idk you figure it out lol
+                <b>How does the game work?</b> Balance the chemical equations idk you figure it out lol. Also there's the other game where you figure out the leftovers and stuff idk you figure it out you're supposed to have learned this stuff in chemistry lmao. go read your notes if you still can't figure this out :(
             </li>
             <li>
                 <b>How does timing work?</b> Time starts upon first level selection. Time stops upon reaching the 5 star screen for the last level. Must complete all three levels (5 stars). You may reset during the run (doesn't reset timer) but your time will only count if you finish all three levels.
@@ -179,10 +191,7 @@
                 <b>Why is the site ugly?</b> It's very 90s esque and it's really simple/usable. They really don't make sites like these anymore (also the site is under 256kb)
             </li>
             <li>
-                <b>Can I remove my name from the leaderboard?</b> If you contact me (you probably know me irl) I can remove it for you. If you don't know who I am use one of the contact methods on my GitHub profile: <a href="https://github.com/AdamEXu" target="_blank">AdamEXu</a>.
-            </li>
-            <li>
-                <b>When more categories?</b> Sometime in the future, maybe...
+                <b>Can I remove my name from the leaderboard?</b> If you contact me (you probably know me irl) I can remove it for you. If you don't know who I am use one of the contact methods on my GitHub profile: <a href="https://github.com/AdamEXu" target="_blank">AdamEXu</a>. Your time won't be removed, but your name shall be censored!
             </li>
         </ul>
     </p>
@@ -190,10 +199,9 @@
         &copy;2026 Adam Xu - Open source on GitHub <a href="https://github.com/AdamEXu/balancing-chemical-equations" target="_blank">AdamEXu/balancing-chemical-equations</a> (would appreciate a star)
     </p>
     <p>
-        Fork of <a href="https://phet.colorado.edu/en/simulation/balancing-chemical-equations" target="_blank">Balancing Chemical Equations</a> by PhET Interactive Simulations, University of Colorado Boulder (Github: <a href="https://github.com/phetsims/balancing-chemical-equations" target="_blank">phetsims/balancing-chemical-equations</a>), licensed under <a href="https://phet.colorado.edu/en/licensing/html" target="_blank">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
+        Fork of <a href="https://phet.colorado.edu/en/simulation/balancing-chemical-equations" target="_blank">Balancing Chemical Equations</a> and <a href="https://phet.colorado.edu/en/simulation/reactants-products-and-leftovers" target="_blank">Reactants, Products, and Leftovers</a> by PhET Interactive Simulations, University of Colorado Boulder, licensed under <a href="https://phet.colorado.edu/en/licensing/html" target="_blank">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
     </p>
     <script>
-        // Initialize music variables and functions FIRST
         var musicOn = false;
         var currentAudio = null;
 
@@ -230,35 +238,29 @@
 
         function openSimulator() {
             var runType = document.getElementById('run-type').value;
-            var url = '/game?run-type=' + runType + '&music=' + musicOn;
+            var isRPL = runType.startsWith('rpl-');
+            var baseUrl = isRPL ? '/game2' : '/game';
+            var url = baseUrl + '?run-type=' + runType + '&music=' + musicOn;
             
-            // Map run-type to gameLevels query parameter
             var gameLevelsMap = {
                 'full': '1,2,3',
                 'easy': '1',
                 'medium': '2',
                 'hard': '3',
-                'remix-full': '1,2,3',
-                'remix-easy': '1',
-                'remix-medium': '2',
-                'remix-hard': '3'
+                'rpl-full': '1,2,3',
+                'rpl-easy': '1',
+                'rpl-medium': '2',
+                'rpl-hard': '3'
             };
             
             if (gameLevelsMap[runType]) {
                 url += '&gameLevels=' + gameLevelsMap[runType];
             }
             
-            // Add remix flag for remix categories
-            if (runType.startsWith('remix-')) {
-                url += '&remix';
-            }
-            
             window.location.href = url;
         }
 
-        // Add event listeners immediately - use both touch and click for Safari
         (function() {
-            // Music toggle button
             var musicToggle = document.getElementById('music-toggle');
             if (musicToggle) {
                 musicToggle.addEventListener('touchstart', function(e) {
@@ -271,7 +273,6 @@
                 });
             }
 
-            // Open simulator button
             var openSimBtn = document.getElementById('open-simulator-btn');
             if (openSimBtn) {
                 openSimBtn.addEventListener('touchstart', function(e) {
@@ -285,9 +286,7 @@
             }
         })();
 
-        // Apply gold background to first place rows (leaderboards only, not user's runs)
-        var leaderboardSection = document.getElementById('leaderboards');
-        if (leaderboardSection) {
+        document.querySelectorAll('.leaderboards').forEach(function(leaderboardSection) {
             leaderboardSection.querySelectorAll('table tr').forEach(function(row) {
                 var rankCell = row.querySelector('td:first-child');
                 if (rankCell && rankCell.textContent.trim() === '🥇') {
@@ -306,15 +305,13 @@
                     });
                 }
             });
-        }
+        });
 
-        // convert all date-time elements to user's local timezone - do this LAST
         setTimeout(function() {
             document.querySelectorAll('.date-time').forEach(function(element) {
                 try {
                     var dateText = element.textContent.trim();
                     if (dateText && dateText.length > 0) {
-                        // iOS Safari requires ISO 8601 format - convert "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SSZ"
                         var isoDate = dateText.replace(' ', 'T') + 'Z';
                         var date = new Date(isoDate);
                         if (date && !isNaN(date.getTime()) && isFinite(date.getTime())) {
