@@ -73,7 +73,9 @@
                 <option value="rpl-medium">Medium (level 2)</option>
                 <option value="rpl-hard">Hard (level 3)</option>
             </optgroup>
-        </select></p>
+        </select>
+        (<span id="cat-type"></span>)
+    </p>
     </div>
     {% else %}
     <div>
@@ -332,6 +334,15 @@
                 }
             });
         }, 100);
+
+        // make it so it displays (Balancing) or (Products & Leftovers) next to the category selection
+        document.getElementById('run-type').addEventListener('change', function() {
+            var runType = this.value;
+            var isRPL = runType.startsWith('rpl-');
+            document.getElementById('cat-type').textContent = isRPL ? '(Products & Leftovers)' : '(Balancing)';
+        });
+        // also on the initial load
+        document.getElementById('cat-type').textContent = '(Balancing)';
     </script>
 </body>
 </html>
