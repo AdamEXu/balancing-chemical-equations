@@ -1,0 +1,8 @@
+.git
+node_modules
+env
+build
+speedrun.db
+.env
+doc
+__pycache__

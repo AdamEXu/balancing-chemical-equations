@@ -15,7 +15,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-in-production')
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
-DATABASE = os.path.join(os.path.dirname(__file__), 'speedrun.db')
+DATABASE = os.path.join(os.environ.get('DATA_DIR', os.path.dirname(__file__)), 'speedrun.db')
 
 VALID_RUN_TYPES = ['full', 'easy', 'medium', 'hard', 'rpl-full', 'rpl-easy', 'rpl-medium', 'rpl-hard']
 RUN_TYPE_LABELS = {
@@ -338,6 +338,7 @@ def submit_time():
         return jsonify({'error': 'Failed to submit time'}), 500
 
 
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     app.run(port=3002, debug=os.getenv("DEBUG", False))
