@@ -6,10 +6,13 @@ from functools import wraps
 from urllib.parse import urlencode
 import requests
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
 app = Flask(__name__)
+# Behind Coolify's Traefik; without this url_for(_external=True) builds http:// OAuth redirect URIs.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-in-production')
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
