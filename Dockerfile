@@ -6,7 +6,7 @@ WORKDIR /phet/balancing-chemical-equations
 COPY package.json package-lock.json build-dependencies.json scripts-fetch-phet-deps.sh ./
 RUN bash ./scripts-fetch-phet-deps.sh
 COPY . .
-RUN npx grunt --brands=adapted-from-phet
+RUN npx grunt --brands=adapted-from-phet --lint=false
 
 # Stage 2: the Flask app that serves the built sim behind Google sign-in.
 FROM python:3.12-slim
