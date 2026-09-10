@@ -6,6 +6,7 @@ set -e
 db="${DATA_DIR:-/data}/speedrun.db"
 seed="${SEED_SQL:-/seed.sql}"
 if [ -s "$seed" ]; then
+  echo "seed $seed has $(grep -c "^INSERT" "$seed") rows"
   if [ -f "$db" ] && [ "${SEED_REPLACE:-}" = "1" ]; then
     backup="$db.bak-$(date +%Y%m%d%H%M%S)"
     mv "$db" "$backup"
