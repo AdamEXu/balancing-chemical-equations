@@ -200,13 +200,13 @@ def game2():
     """Game 2 route - requires login, serves built RPL game HTML with speedrun modifications"""
     build_path = os.path.join(
         os.path.dirname(__file__),
-        '../reactants-products-and-leftovers/build/adapted-from-phet/reactants-products-and-leftovers_en_adapted-from-phet.html'
+        'prebuilt/reactants-products-and-leftovers_en_adapted-from-phet.html'
     )
 
     if not os.path.exists(build_path):
         return render_template(
             'fail.html',
-            error='Game build not found. Please run: npx grunt --brands=adapted-from-phet in the reactants-products-and-leftovers directory',
+            error='Game build not found. Expected prebuilt/reactants-products-and-leftovers_en_adapted-from-phet.html',
             link='/'
         )
 

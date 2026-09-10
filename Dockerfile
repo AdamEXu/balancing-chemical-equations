@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py docker-entrypoint.sh ./
 COPY templates templates
 COPY static static
+COPY prebuilt prebuilt
 COPY --from=sim /phet/balancing-chemical-equations/build/adapted-from-phet/balancing-chemical-equations_en_adapted-from-phet.html \
      build/adapted-from-phet/
 ENV DATA_DIR=/data
